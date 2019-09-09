@@ -30,6 +30,8 @@ target 'StardewSyncFrontend' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'RNAWSCognito', :path => '../node_modules/amazon-cognito-identity-js'
+
   target 'StardewSyncFrontendTests' do
     inherit! :search_paths
     # Pods for testing

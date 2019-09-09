@@ -5,9 +5,14 @@
   "scripts": {
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "shake": "adb shell input keyevent 82"
   },
   "dependencies": {
+    "amazon-cognito-identity-js": "^3.0.15",
+    "aws-amplify": "^1.1.38",
+    "aws-amplify-react-native": "^2.1.19",
+    "aws-sdk": "^2.524.0",
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-elements": "^1.2.0",
