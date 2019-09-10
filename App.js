@@ -10,7 +10,7 @@ import React, { Component, Fragment } from 'react';
 import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
-import Amplify, { Auth, API } from 'aws-amplify';
+import Amplify, { Auth, API, Storage } from 'aws-amplify';
 
 Amplify.configure({
     Auth: {
@@ -83,7 +83,8 @@ async function login(){
     try{
         console.log("Logging in!");
 
-        const user = await Auth.signIn('rbest', '***REMOVED***');
+        // const user = await Auth.signIn('dev1', '123456');
+        const user = await Auth.signIn('dev2', '123456');
 
         if(user.challengeName){
             console.log(`User must complete a login challenge of type ${user.challengeName}, this should have been impossible`);
@@ -93,7 +94,12 @@ async function login(){
         console.log("Logged in!");
         console.log(user);
 
-        console.log(await API.get('notifs', '/saves', {headers: {'Authorization': user.signInUserSession.idToken.jwtToken}}))
+        // console.log(await API.get('notifs', '/saves', {headers: {'Authorization': user.signInUserSession.idToken.jwtToken}}))
+
+        Storage.configure({level: 'private'});
+        Storage.put(`test.txt`, 'Hooray!', {customPrefix:{private:'userdata/'}})
+        .then (result => console.log(result)) // {key: "test.txt"}
+        .catch(err => console.log(err));
     } catch (err) {
         console.log(err.code);
         if (err.code === 'UserNotConfirmedException') {
