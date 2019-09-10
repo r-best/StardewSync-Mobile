@@ -10,7 +10,7 @@ import React, { Component, Fragment } from 'react';
 import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
-import Amplify, { Auth } from 'aws-amplify';
+import Amplify, { Auth, API } from 'aws-amplify';
 
 Amplify.configure({
     Auth: {
@@ -18,6 +18,12 @@ Amplify.configure({
         region: 'us-east-1',
         userPoolId: 'us-east-1_XF6sCfQ0Z',
         userPoolWebClientId: '3lv9ik94255h1f0e1s2c0rp8e1',
+    },
+    API: {
+        endpoints: [{
+            name: "notifs",
+            endpoint: "https://3pff544onj.execute-api.us-east-1.amazonaws.com/dev"
+        }]
     },
     Storage: {
         AWSS3: {
@@ -75,7 +81,7 @@ function test(number){
 
 async function login(){
     try{
-        console.log("Logging in!")
+        console.log("Logging in!");
 
         const user = await Auth.signIn('rbest', '***REMOVED***');
 
@@ -87,14 +93,7 @@ async function login(){
         console.log("Logged in!");
         console.log(user);
 
-        let res = await fetch('https://3pff544onj.execute-api.us-east-1.amazonaws.com/dev/saves', {
-            method: 'GET',
-            headers: {
-                'Authorization': user.signInUserSession.idToken.jwtToken,
-                'Content-Type': 'application/json'
-            }
-        });
-        console.log(await res.text());
+        console.log(await API.get('notifs', '/saves', {headers: {'Authorization': user.signInUserSession.idToken.jwtToken}}))
     } catch (err) {
         console.log(err.code);
         if (err.code === 'UserNotConfirmedException') {
