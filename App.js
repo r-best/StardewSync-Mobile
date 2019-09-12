@@ -14,26 +14,9 @@ import Amplify, { Auth, API, Storage } from 'aws-amplify';
 
 import { readDir, readFile, writeFile, ExternalStorageDirectoryPath } from 'react-native-fs';
 
-Amplify.configure({
-    Auth: {
-        identityPoolId: 'us-east-1:64d632ee-d1f1-4a72-9665-615c65fa0827',
-        region: 'us-east-1',
-        userPoolId: 'us-east-1_XF6sCfQ0Z',
-        userPoolWebClientId: '3lv9ik94255h1f0e1s2c0rp8e1',
-    },
-    API: {
-        endpoints: [{
-            name: "notifs",
-            endpoint: "https://3pff544onj.execute-api.us-east-1.amazonaws.com/dev"
-        }]
-    },
-    Storage: {
-        AWSS3: {
-            bucket: 'stardewsync-dev',
-            region: 'us-east-1',
-        }
-    }
-})
+import awsconfig from './awsconfig-dev';
+
+Amplify.configure(awsconfig)
 
 const App = () => {
     return (
@@ -132,8 +115,8 @@ async function login(){
 
         console.log("Logged in!");
         console.log(user);
+        return true;
 
-        // console.log(await API.get('notifs', '/saves', {headers: {'Authorization': user.signInUserSession.idToken.jwtToken}}))
 
         Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
         Storage.list('')
@@ -159,6 +142,7 @@ async function login(){
         } else {
             console.log(err);
         }
+        return false;
     }
 }
 
