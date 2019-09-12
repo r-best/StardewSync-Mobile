@@ -18,7 +18,7 @@ const AppContainer = createAppContainer(
         {
             Home: Homescreen,
         },
-        { initialRouteName: 'Home' }
+        { initialRouteName: 'Home', headerMode: 'none' }
     )
 );
 
