@@ -44,12 +44,15 @@ async function login(){
 }
 
 async function getUserFiles(){
-    Storage.list('')
-    .then(result => console.log(result))
-    .catch(err => console.log(err));
-    // Storage.put(`test.txt`, 'Hooray!')
-    // .then (result => console.log(result)) // {key: "test.txt"}
-    // .catch(err => console.log(err));
+    try{
+        
+
+        let saveDirs = Storage.list('')
+        console.log(saveDirs);
+    }
+    catch(e){
+        console.log(e)
+    }
 }
 
-export default { initialize, login, getUserFiles };
+export { initialize, login, getUserFiles };

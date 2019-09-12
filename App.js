@@ -6,12 +6,16 @@
  * @flow
  */
 
-import React, { Component, Fragment } from 'react';
-import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
-import Homescreen from './src/components/Homescreen';
-
+import React from 'react'; // Unused here but needed for withAuthenticator or it crashes on login
+import { withAuthenticator } from 'aws-amplify-react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+
+import { initialize, login } from './src/shared/aws_services';
+import Homescreen from './src/components/Homescreen';
+
+initialize();
+login();
 
 const AppContainer = createAppContainer(
     createStackNavigator(
@@ -22,6 +26,6 @@ const AppContainer = createAppContainer(
     )
 );
 
-export default App = () => {
+export default App = withAuthenticator(() => {
     return <AppContainer />
-};
+});

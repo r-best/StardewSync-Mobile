@@ -18,7 +18,6 @@ const Homescreen = () => {
                 centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
                 rightComponent={{ icon: 'menu', color: '#fff' }}
             />
-            <Button onPress={() => testFS()}></Button>
 
             {saveslot(0)}
             {saveslot(1)}

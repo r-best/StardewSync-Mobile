@@ -37,4 +37,4 @@ async function testFS(){
     }
 }
 
-export default { testFS };
+export { testFS };
