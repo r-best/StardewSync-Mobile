@@ -7,10 +7,12 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
 import Amplify, { Auth, API, Storage } from 'aws-amplify';
+
+import { readDir, readFile, writeFile, ExternalStorageDirectoryPath } from 'react-native-fs';
 
 Amplify.configure({
     Auth: {
@@ -41,7 +43,7 @@ const App = () => {
                 centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
                 rightComponent={{ icon: 'menu', color: '#fff' }}
             />
-            <Button onPress={() => login()}></Button>
+            <Button onPress={() => testFS()}></Button>
 
             {saveslot(0)}
             {saveslot(1)}
@@ -79,6 +81,43 @@ function test(number){
     console.log(number);
 }
 
+async function testFS(){
+    try{
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
+                title: 'Stardew Sync',
+                message: 'May I wead youwre extewnal stowage pwease? I need it to get to youwr existing save fiwes! :3c',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'No.',
+                buttonPositive: 'Yeah!',
+            },
+        );
+        const granted2 = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, {
+                title: 'Stardew Sync',
+                message: 'May I write to youwre extewnal stowage pwease? I need it to save youwr new save fiwes! :3c',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'No.',
+                buttonPositive: 'Yeah!',
+            },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED && granted2 == PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('You can use the storage!');
+
+            await writeFile(ExternalStorageDirectoryPath+"/StardewValley/Bobby_222982957/HELLOWOROWLSD.txt", "hello!")
+            let x = await readFile(ExternalStorageDirectoryPath+"/StardewValley/Bobby_222982957/HELLOWOROWLSD.txt")
+            console.log(x)
+        } else {
+            console.log('Storage permission denied :(');
+        }
+
+
+    }
+    catch(e){
+        console.log(e)
+    }
+}
+
 async function login(){
     try{
         console.log("Logging in!");
@@ -96,10 +135,13 @@ async function login(){
 
         // console.log(await API.get('notifs', '/saves', {headers: {'Authorization': user.signInUserSession.idToken.jwtToken}}))
 
-        Storage.configure({level: 'private'});
-        Storage.put(`test.txt`, 'Hooray!', {customPrefix:{private:'userdata/'}})
-        .then (result => console.log(result)) // {key: "test.txt"}
+        Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
+        Storage.list('')
+        .then(result => console.log(result))
         .catch(err => console.log(err));
+        // Storage.put(`test.txt`, 'Hooray!')
+        // .then (result => console.log(result)) // {key: "test.txt"}
+        // .catch(err => console.log(err));
     } catch (err) {
         console.log(err.code);
         if (err.code === 'UserNotConfirmedException') {
