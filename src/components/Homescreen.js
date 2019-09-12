@@ -10,14 +10,6 @@ import React, { Component, Fragment } from 'react';
 import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
-import Amplify, { Auth, API, Storage } from 'aws-amplify';
-
-import { readDir, readFile, writeFile, ExternalStorageDirectoryPath } from 'react-native-fs';
-
-import awsconfig from './../../awsconfig-dev';
-
-Amplify.configure(awsconfig)
-
 const Homescreen = () => {
     return (
         <View style={{flex:1}}>
@@ -62,88 +54,6 @@ const styles = StyleSheet.create({
 
 function test(number){
     console.log(number);
-}
-
-async function testFS(){
-    try{
-        const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE, {
-                title: 'Stardew Sync',
-                message: 'May I wead youwre extewnal stowage pwease? I need it to get to youwr existing save fiwes! :3c',
-                buttonNeutral: 'Ask Me Later',
-                buttonNegative: 'No.',
-                buttonPositive: 'Yeah!',
-            },
-        );
-        const granted2 = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, {
-                title: 'Stardew Sync',
-                message: 'May I write to youwre extewnal stowage pwease? I need it to save youwr new save fiwes! :3c',
-                buttonNeutral: 'Ask Me Later',
-                buttonNegative: 'No.',
-                buttonPositive: 'Yeah!',
-            },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED && granted2 == PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('You can use the storage!');
-
-            await writeFile(ExternalStorageDirectoryPath+"/StardewValley/Bobby_222982957/HELLOWOROWLSD.txt", "hello!")
-            let x = await readFile(ExternalStorageDirectoryPath+"/StardewValley/Bobby_222982957/HELLOWOROWLSD.txt")
-            console.log(x)
-        } else {
-            console.log('Storage permission denied :(');
-        }
-
-
-    }
-    catch(e){
-        console.log(e)
-    }
-}
-
-async function login(){
-    try{
-        console.log("Logging in!");
-
-        // const user = await Auth.signIn('dev1', '123456');
-        const user = await Auth.signIn('dev2', '123456');
-
-        if(user.challengeName){
-            console.log(`User must complete a login challenge of type ${user.challengeName}, this should have been impossible`);
-            return;
-        }
-
-        console.log("Logged in!");
-        console.log(user);
-        return true;
-
-
-        Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
-        Storage.list('')
-        .then(result => console.log(result))
-        .catch(err => console.log(err));
-        // Storage.put(`test.txt`, 'Hooray!')
-        // .then (result => console.log(result)) // {key: "test.txt"}
-        // .catch(err => console.log(err));
-    } catch (err) {
-        console.log(err.code);
-        if (err.code === 'UserNotConfirmedException') {
-            // The error happens if the user didn't finish the confirmation step when signing up
-            // In this case you need to resend the code and confirm the user
-            // About how to resend the code and confirm the user, please check the signUp part
-        } else if (err.code === 'PasswordResetRequiredException') {
-            // The error happens when the password is reset in the Cognito console
-            // In this case you need to call forgotPassword to reset the password
-            // Please check the Forgot Password part.
-        } else if (err.code === 'NotAuthorizedException') {
-            // The error happens when the incorrect password is provided
-        } else if (err.code === 'UserNotFoundException') {
-            // The error happens when the supplied username/email does not exist in the Cognito user pool
-        } else {
-            console.log(err);
-        }
-        return false;
-    }
 }
 
 export default Homescreen;
