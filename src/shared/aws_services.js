@@ -1,11 +1,59 @@
 import Amplify, { Auth, API, Storage } from 'aws-amplify';
 
-async function getUserFiles(){
-    try{
-        
+import { parseStringPromise } from 'xml2js';
 
-        let saveDirs = Storage.list('')
-        console.log(saveDirs);
+/**
+ * Replacement for Amplify's Storage.get because for some reason it
+ * returns a public URL where you can access the object instead of
+ * just returning the object
+ * @param {} url 
+ */
+async function StorageGet(url){
+    try{
+        let S3Url = await Storage.get(url, {expires:60});
+        let res = await (await fetch(S3Url)).text();
+        let xml = await parseStringPromise(res);
+
+        if("Error" in xml){
+            console.log(`Error fetching '${url}': ${xml['Error']['Message']}`);
+            return false;
+        }
+
+        return xml;
+    }
+    catch(e){
+        console.log(e)
+    }
+}
+
+/**
+ * Gets which save slots are in use
+ */
+async function getActiveUserFiles(){
+    try{
+        let saveDirs = await Storage.list('');
+
+        let slots = [];
+        saveDirs.forEach(e => {
+            let matches = e.key.match(/^saveslot(\d)\/SaveGameInfo/);
+            if(matches !== null) slots.push(matches[1]);
+        });
+        return slots.filter((e, index) => slots.indexOf(e) === index);
+    }
+    catch(e){
+        console.log(e)
+    }
+}
+
+/**
+ * Retrieves the basic info on the save file in the given slot
+ * @param {*} slotNum 
+ */
+async function getSaveDataBasic(slotNum){
+    try{
+        let save = await StorageGet(`saveslot${slotNum}/SaveGameInfo`);
+        console.log(save)
+        return save
     }
     catch(e){
         console.log(e)
@@ -48,4 +96,4 @@ async function login(){
     }
 }
 
-export { initialize, login, getUserFiles };
+export { login, getActiveUserFiles, getSaveDataBasic };

@@ -10,6 +10,8 @@ import React, { Component, Fragment } from 'react';
 import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
+import { getActiveUserFiles, getSaveDataBasic } from '../shared/aws_services';
+
 const Homescreen = () => {
     return (
         <View style={{flex:1}}>
@@ -33,8 +35,8 @@ const saveslot = (number) => (
         </View>
         <View style={{ justifyContent: 'center' }}>
             <View style={{ display: 'flex', flexDirection: 'row'}}>
-                <Button style={{flex:1}} icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => test(number)}></Button>
-                <Button style={{flex:1}} icon={{name: "cloud-download", size: 15, color: "white"}} onPress={() => test(number)}></Button>
+                <Button style={{flex:1}} icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => getActiveUserFiles()}></Button>
+                <Button style={{flex:1}} icon={{name: "cloud-download", size: 15, color: "white"}} onPress={() => getSaveDataBasic(number)}></Button>
                 <Button style={{flex:1}} icon={{name: "delete", size: 15, color: "white"}} onPress={() => test(number)}></Button>
             </View>
         </View>
