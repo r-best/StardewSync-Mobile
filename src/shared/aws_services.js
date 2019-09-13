@@ -1,10 +1,15 @@
 import Amplify, { Auth, API, Storage } from 'aws-amplify';
 
-import awsconfig from './../../awsconfig-dev';
+async function getUserFiles(){
+    try{
+        
 
-function initialize(){
-    Amplify.configure(awsconfig);
-    Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
+        let saveDirs = Storage.list('')
+        console.log(saveDirs);
+    }
+    catch(e){
+        console.log(e)
+    }
 }
 
 async function login(){
@@ -40,18 +45,6 @@ async function login(){
             console.log(err);
         }
         return false;
-    }
-}
-
-async function getUserFiles(){
-    try{
-        
-
-        let saveDirs = Storage.list('')
-        console.log(saveDirs);
-    }
-    catch(e){
-        console.log(e)
     }
 }
 

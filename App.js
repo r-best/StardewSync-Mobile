@@ -7,14 +7,17 @@
  */
 
 import React from 'react'; // Unused here but needed for withAuthenticator or it crashes on login
+import Amplify, { Storage } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import { initialize, login } from './src/shared/aws_services';
+import { login } from './src/shared/aws_services';
 import Homescreen from './src/components/Homescreen';
 
-initialize();
+Amplify.configure(awsconfig);
+Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
+
 login();
 
 const AppContainer = createAppContainer(
