@@ -13,6 +13,7 @@ import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import { login } from './src/shared/aws_services';
+import awsconfig from './awsconfig-dev';
 import Homescreen from './src/components/Homescreen';
 
 Amplify.configure(awsconfig);
