@@ -1,42 +1,26 @@
-import Amplify, { Auth, API, Storage } from 'aws-amplify';
+import { Auth, API, Storage } from 'aws-amplify';
 
-import { parseStringPromise } from 'xml2js';
+import { NUM_CLOUD_SAVES, StorageGet } from './utils';
 
 /**
- * Replacement for Amplify's Storage.get because for some reason it
- * returns a public URL where you can access the object instead of
- * just returning the object
- * @param {} url 
+ * Updated on every call to getSaves(), stores the
+ * `SaveGameInfo` xml file of every save in order to build
+ * menu items for them on the homescreen, as well as save
+ * a few kB on download costs when the user downloads a save
  */
-async function StorageGet(url){
-    try{
-        let S3Url = await Storage.get(url, {expires:60});
-        let res = await (await fetch(S3Url)).text();
-        let xml = await parseStringPromise(res);
-
-        if("Error" in xml){
-            console.log(`Error fetching '${url}': ${xml['Error']['Message']}`);
-            return false;
-        }
-
-        return xml;
-    }
-    catch(e){
-        console.log(e)
-    }
-}
+let saves_cache = [];
 
 /**
  * Gets which save slots are in use
  */
-async function getActiveUserFiles(){
+async function getActiveSlots(){
     try{
         let saveDirs = await Storage.list('');
 
         let slots = [];
         saveDirs.forEach(e => {
             let matches = e.key.match(/^saveslot(\d)\/SaveGameInfo/);
-            if(matches !== null) slots.push(matches[1]);
+            if(matches !== null) slots.push(parseInt(matches[1]));
         });
         return slots.filter((e, index) => slots.indexOf(e) === index);
     }
@@ -46,20 +30,37 @@ async function getActiveUserFiles(){
 }
 
 /**
- * Retrieves the basic info on the save file in the given slot
- * @param {*} slotNum 
+ * Retrieves the basic info on the user's saves
  */
-async function getSaveDataBasic(slotNum){
+async function getSaves(){
     try{
-        let save = await StorageGet(`saveslot${slotNum}/SaveGameInfo`);
-        console.log(save)
-        return save
+        let activeSlots = await getActiveSlots();
+
+        let ret = [];
+        for(let i = 1; i <= NUM_CLOUD_SAVES; i++){
+            if(activeSlots.includes(i))
+                ret[i] = await StorageGet(`saveslot${i}/SaveGameInfo`);
+            else
+                ret[i] = false;
+            // ret[slot] = {
+            //     name: save['name'],
+            //     farm: save['farmName'],
+            //     money: save['money'],
+            //     playtime: save['millisecondsPlayed']
+            // };
+        }
+        saves_cache = ret;
+        return saves_cache;
     }
     catch(e){
         console.log(e)
+        return saves_cache;
     }
 }
 
+/**
+ * Only used for debugging
+ */
 async function login(){
     try{
         console.log("Logging in!");
@@ -69,7 +70,7 @@ async function login(){
 
         if(user.challengeName){
             console.log(`User must complete a login challenge of type ${user.challengeName}, this should have been impossible`);
-            return;
+            return false;
         }
 
         console.log("Logged in!");
@@ -77,23 +78,8 @@ async function login(){
         return true;
     } catch (err) {
         console.log(err.code);
-        if (err.code === 'UserNotConfirmedException') {
-            // The error happens if the user didn't finish the confirmation step when signing up
-            // In this case you need to resend the code and confirm the user
-            // About how to resend the code and confirm the user, please check the signUp part
-        } else if (err.code === 'PasswordResetRequiredException') {
-            // The error happens when the password is reset in the Cognito console
-            // In this case you need to call forgotPassword to reset the password
-            // Please check the Forgot Password part.
-        } else if (err.code === 'NotAuthorizedException') {
-            // The error happens when the incorrect password is provided
-        } else if (err.code === 'UserNotFoundException') {
-            // The error happens when the supplied username/email does not exist in the Cognito user pool
-        } else {
-            console.log(err);
-        }
         return false;
     }
 }
 
-export { login, getActiveUserFiles, getSaveDataBasic };
+export { login, saves_cache, getActiveSlots, getSaves };
