@@ -21,12 +21,6 @@ class Homescreen extends Component{
     render(){
         return (
             <View style={{flex:1}}>
-                <Header 
-                    leftComponent={{ icon: 'message', color: '#fff' }}
-                    centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-                    rightComponent={{ icon: 'menu', color: '#fff' }}
-                />
-
                 {aws.saves_cache.map((e,i) => (
                     <View key={i} style={styles.saveslot}>
                         {e ? 

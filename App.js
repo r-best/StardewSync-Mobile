@@ -7,27 +7,86 @@
  */
 
 import React from 'react'; // Unused here but needed for withAuthenticator or it crashes on login
+import { Dimensions, TouchableOpacity, Text, Button } from 'react-native';
+import { Icon } from 'react-native-elements';
 import Amplify, { Storage } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 
 import { login } from './src/shared/aws_services';
 import awsconfig from './awsconfig-dev';
 import Homescreen from './src/components/Homescreen';
+import LeftDrawer from './src/components/LeftDrawer';
+import RightDrawer from './src/components/RightDrawer';
 
 Amplify.configure(awsconfig);
 Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
 
 login();
 
-const AppContainer = createAppContainer(
-    createStackNavigator(
-        {
-            Home: Homescreen,
+const stackNav = createStackNavigator({
+    Home: {
+        screen: Homescreen,
+        navigationOptions: ({ navigation }) => ({
+            title: "StardewSync",
+            headerLeft: (
+                <Icon 
+                    name="message" 
+                    style={{ marginRight: 10, paddingLeft: 15 }}
+                    onPress={navigation.toggleLeftDrawer}
+                />
+            ),
+            headerRight: (
+                <Icon 
+                    name="menu" 
+                    style={{ marginRight: 10, paddingLeft: 15 }}
+                    onPress={navigation.toggleRightDrawer}
+                />
+            )
+        })
+    }
+});
+
+const rightDrawerNav = createDrawerNavigator(
+    {
+        stackNav: stackNav
+    },
+    {
+        drawerPosition: 'right',
+        contentComponent: RightDrawer,
+        getCustomActionCreators: (route, stateKey) => {
+            return {
+                toggleRightDrawer: () => {
+                    console.log("Opening Right Drawer");
+                    return DrawerActions.toggleDrawer({ key: stateKey })
+                }
+            };
         },
-        { initialRouteName: 'Home', headerMode: 'none' }
-    )
+    }
+);
+
+const leftDrawerNav = createDrawerNavigator(
+    {
+        rightDrawer: rightDrawerNav
+    },
+    {
+        drawerPosition: 'left',
+        contentComponent: LeftDrawer,
+        getCustomActionCreators: (route, stateKey) => {
+            return {
+                toggleLeftDrawer: () => {
+                    console.log("Opening Left Drawer");
+                    return DrawerActions.toggleDrawer({ key: stateKey })
+                },
+            };
+        },
+    }
+);
+
+const AppContainer = createAppContainer(
+    leftDrawerNav
 );
 
 export default App = withAuthenticator(() => {
