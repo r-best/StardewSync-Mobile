@@ -18,6 +18,7 @@ import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 import { login } from './src/shared/aws_services';
 import awsconfig from './awsconfig-dev';
 import Homescreen from './src/components/Homescreen';
+import LocalSavesScreen from './src/components/LocalSavesScreen';
 import LeftDrawer from './src/components/LeftDrawer';
 import RightDrawer from './src/components/RightDrawer';
 
@@ -45,6 +46,12 @@ const stackNav = createStackNavigator({
                     onPress={navigation.toggleRightDrawer}
                 />
             )
+        })
+    },
+    LocalSaves: {
+        screen: LocalSavesScreen,
+        navigationOptions: ({navigation}) => ({
+            title: "Local Save Files"
         })
     }
 });

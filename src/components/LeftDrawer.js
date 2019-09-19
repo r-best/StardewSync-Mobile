@@ -13,7 +13,7 @@ class LeftDrawer extends Component {
     render () {
         return (
             <View style={styles.container}>
-                <Text>RIGHT DRAWER</Text>
+                <Text>LEFT DRAWER</Text>
             </View>
         );
     }

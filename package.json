@@ -13,6 +13,7 @@
     "aws-amplify": "^1.1.38",
     "aws-amplify-react-native": "^2.1.19",
     "aws-sdk": "^2.524.0",
+    "path": "^0.12.7",
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-elements": "^1.2.0",

@@ -30,7 +30,7 @@ class Homescreen extends Component{
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
                                     <View style={{ display: 'flex', flexDirection: 'row'}}>
-                                        <Button style={{flex:1}} icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => aws.getActiveUserFiles()}></Button>
+                                        <Button style={{flex:1}} icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => this.props.navigation.navigate("LocalSaves")}></Button>
                                         <Button style={{flex:1}} icon={{name: "cloud-download", size: 15, color: "white"}} onPress={() => test(number)}></Button>
                                         <Button style={{flex:1}} icon={{name: "delete", size: 15, color: "white"}} onPress={() => test(number)}></Button>
                                     </View>
