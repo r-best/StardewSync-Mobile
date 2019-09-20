@@ -80,10 +80,11 @@ async function getSaves(){
             for(let i = 0; i < saves.length; i++){
                 let save = await parseStringPromise(await _readExternal(saves[i]+"/SaveGameInfo"));
                 saves[i] = {
-                    name: save['Farmer']['name'],
-                    farm: save['Farmer']['farmName'],
-                    money: save['Farmer']['money'],
-                    playtime: save['Farmer']['millisecondsPlayed']
+                    id: saves[i],
+                    name: save['Farmer']['name'][0],
+                    farm: save['Farmer']['farmName'][0],
+                    money: save['Farmer']['money'][0],
+                    playtime: save['Farmer']['millisecondsPlayed'][0]
                 };
             }
             return saves;

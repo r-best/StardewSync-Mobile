@@ -7,49 +7,67 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
+import { StyleSheet, FlatList, View, Text, Alert } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
 import * as local from '../shared/fs_android';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class LocalSavesScreen extends Component{
-    state={localSaves:[]};
+    state = {
+        localSaves: []
+    };
+  
+    onSelect(item){
+        Alert.alert('Unimplemented', 'Hold up', [
+            {
+                text: 'Cancel',
+                onPress: () => {},
+                style: 'cancel'
+            },
+            {
+                text: 'Yes',
+                onPress: () => console.log("Yes!")
+            }
+        ],
+        {cancelable: false});
+    };
 
     async componentDidMount(){
-        let saves = await local.getSaves()
-        console.log("SAVES", saves)
         this.setState({
-            localSaves: saves
+            localSaves: await local.getSaves()
         });
-        console.log(this.state.localSaves)
     }
 
     render(){
-        console.log("RENDERING", this.state.localSaves)
         return (
-            <View style={{flex:1}}>
-                {this.state.localSaves.map((e,i) => (
-                    // A Save Slot
-                    <View key={i} style={styles.saveslot}>
+            <FlatList
+                data={this.state.localSaves}
+                keyExtractor={e => e.id}
+                renderItem={({item, i}) => (
+                    <TouchableOpacity 
+                        style={styles.saveslot}
+                        onPress={() => this.onSelect.bind(this)(item)}>
+
                         {/* Left half */}
                         <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
                             <View style={{ display: 'flex', flexDirection: 'row' }}>
                                 <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <Text>{e['name']}</Text>
-                                    <Text>{e['farm']} Farm</Text>
+                                    <Text>{item['name']}</Text>
+                                    <Text>{item['farm']} Farm</Text>
                                 </View>
                                 <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <Text>${e['money']}</Text>
-                                    <Text>{Math.round(e['playtime']/3600000)} hours</Text>
+                                    <Text>${item['money']}</Text>
+                                    <Text>{Math.round(item['playtime']/3600000)} hours</Text>
                                 </View>
                             </View>
                         </View>
                         {/* Right half */}
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         </View>
-                    </View>
-                ))}
-            </View>
+                    </TouchableOpacity>
+                )}
+            />
         );
     }
 };
