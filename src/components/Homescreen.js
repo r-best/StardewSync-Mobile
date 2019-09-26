@@ -10,7 +10,21 @@ import React, { Component, Fragment } from 'react';
 import { StyleSheet, ScrollView, View, Text, StatusBar, PermissionsAndroid } from 'react-native';
 import { Header, Button } from 'react-native-elements';
 
+import * as local from '../shared/fs_android';
 import * as aws from '../shared/aws_services';
+
+function upload(index){ 
+    return async(savename) => {
+        console.log("Reading save file from disk...");
+        let [ file, file_old, savegameinfo, savegameinfo_old ] = await local.getSave(savename);
+        console.log("Successfully read save file", savename);
+
+        console.log("Uploading to S3...");
+        let ret = await aws.uploadSave(index, savename, file, file_old, savegameinfo, savegameinfo_old);
+        if(ret) console.log(`Successfully uploaded save file ${savename} to slot ${index}`);
+        else console.log(`Error uploading save file ${savename} to slot ${index}`)
+    }
+}
 
 class Homescreen extends Component{
     async componentDidMount(){
@@ -30,9 +44,21 @@ class Homescreen extends Component{
                                 </View>
                                 <View style={{ justifyContent: 'center' }}>
                                     <View style={{ display: 'flex', flexDirection: 'row'}}>
-                                        <Button style={{flex:1}} icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => this.props.navigation.navigate("LocalSaves")}></Button>
-                                        <Button style={{flex:1}} icon={{name: "cloud-download", size: 15, color: "white"}} onPress={() => test(number)}></Button>
-                                        <Button style={{flex:1}} icon={{name: "delete", size: 15, color: "white"}} onPress={() => test(number)}></Button>
+                                        <Button style={{flex:1}} 
+                                            icon={{name: "cloud-upload", size: 15, color: "white"}} 
+                                            onPress={() => 
+                                                this.props.navigation.navigate("LocalSaves", {callback:upload(i).bind(this)})
+                                        } />
+                                        <Button style={{flex:1}} 
+                                            icon={{name: "cloud-download", size: 15, color: "white"}} 
+                                            onPress={() => 
+                                                test(number)
+                                        } />
+                                        <Button style={{flex:1}} 
+                                            icon={{name: "delete", size: 15, color: "white"}} 
+                                            onPress={() => 
+                                                test(number)
+                                        } />
                                     </View>
                                 </View>
                             </View>
@@ -42,7 +68,7 @@ class Homescreen extends Component{
                                     <Text>Empty</Text>
                                 </View>
                                 <View style={{ display: 'flex', justifyContent: 'center', alignContent: 'flex-end' }}>
-                                        <Button icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => aws.getActiveUserFiles()}></Button>
+                                        <Button icon={{name: "cloud-upload", size: 15, color: "white"}} onPress={() => this.props.navigation.navigate("LocalSaves", {callback:upload(i).bind(this)})}></Button>
                                 </View>
                             </View>
                         }

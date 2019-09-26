@@ -11,6 +11,36 @@ import { NUM_CLOUD_SAVES, StorageGet } from './utils';
 let saves_cache = [];
 
 /**
+ * 
+ * @param {number} index 
+ * @param {string} file 
+ * @param {string} file_old 
+ * @param {string} savegameinfo 
+ * @param {string} savegameinfo_old 
+ */
+async function uploadSave(index, name, file, file_old, savegameinfo, savegameinfo_old){
+    try{
+        let ret = await Storage.put(`saveslot${index}/${name}`, file);
+        if(!('key' in ret)) throw Error(`Error uploading ${name}`, ret);
+
+        ret = await Storage.put(`saveslot${index}/${name}_old`, file_old);
+        if(!('key' in ret)) throw Error(`Error uploading ${name}_old`, ret);
+
+        ret = await Storage.put(`saveslot${index}/SaveGameInfo`, savegameinfo);
+        if(!('key' in ret)) throw Error(`Error uploading SaveGameInfo`, ret);
+
+        ret = await Storage.put(`saveslot${index}/SaveGameInfo_old`, savegameinfo_old);
+        if(!('key' in ret)) throw Error(`Error uploading SaveGameInfo`, ret);
+
+        return true;
+    }
+    catch(e){
+        console.log(e);
+        return false;
+    }
+}
+
+/**
  * Gets which save slots are in use
  */
 async function getActiveSlots(){
@@ -82,4 +112,4 @@ async function login(){
     }
 }
 
-export { login, saves_cache, getActiveSlots, getSaves };
+export { login, saves_cache, getActiveSlots, getSaves, uploadSave };

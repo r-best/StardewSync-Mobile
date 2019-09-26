@@ -14,23 +14,22 @@ import * as local from '../shared/fs_android';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class LocalSavesScreen extends Component{
-    state = {
-        localSaves: []
-    };
+    state = { localSaves: [] };
   
     onSelect(item){
-        Alert.alert('Unimplemented', 'Hold up', [
-            {
-                text: 'Cancel',
-                onPress: () => {},
-                style: 'cancel'
-            },
-            {
-                text: 'Yes',
-                onPress: () => console.log("Yes!")
-            }
-        ],
-        {cancelable: false});
+        // Alert.alert('Unimplemented', 'Hold up', [
+        //     {
+        //         text: 'Cancel',
+        //         onPress: () => {},
+        //         style: 'cancel'
+        //     },
+        //     {
+        //         text: 'Yes',
+        //         onPress: () => console.log("Yes!")
+        //     }
+        // ],
+        // {cancelable: false});
+        this.props.navigation.state.params.callback(item['id'])
     };
 
     async componentDidMount(){
@@ -45,26 +44,15 @@ class LocalSavesScreen extends Component{
                 data={this.state.localSaves}
                 keyExtractor={e => e.id}
                 renderItem={({item, i}) => (
-                    <TouchableOpacity 
-                        style={styles.saveslot}
-                        onPress={() => this.onSelect.bind(this)(item)}>
-
-                        {/* Left half */}
-                        <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
-                            <View style={{ display: 'flex', flexDirection: 'row' }}>
-                                <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <Text>{item['name']}</Text>
-                                    <Text>{item['farm']} Farm</Text>
-                                </View>
-                                <View style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <Text>${item['money']}</Text>
-                                    <Text>{Math.round(item['playtime']/3600000)} hours</Text>
-                                </View>
+                    <TouchableOpacity style={styles.saveslot} onPress={() => this.onSelect.bind(this)(item)}>
+                            <View style={styles.saveslot_div}>
+                                <Text>{item['name']}</Text>
+                                <Text>{item['farm']} Farm</Text>
                             </View>
-                        </View>
-                        {/* Right half */}
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        </View>
+                            <View style={styles.saveslot_div}>
+                                <Text>${item['money']}</Text>
+                                <Text>{Math.round(item['playtime']/3600000)} hours</Text>
+                            </View>
                     </TouchableOpacity>
                 )}
             />
@@ -75,10 +63,20 @@ class LocalSavesScreen extends Component{
 const styles = StyleSheet.create({
     saveslot: {
         display: 'flex',
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
+        marginBottom: 25,
+        borderStyle: 'solid',
+        borderWidth: 2,
+        borderRadius: 25
+    },
+    saveslot_div: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

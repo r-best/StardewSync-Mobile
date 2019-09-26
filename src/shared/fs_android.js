@@ -97,4 +97,22 @@ async function getSaves(){
     }
 }
 
-export { getSaves };
+/**
+ * Returns all the data of a particular save file by name, may take time
+ * @param {*} name 
+ */
+async function getSave(name){
+    try{
+        let file = await readFile(`${STARDEW_SAVE_PATH}${name}/${name}`);
+        let file_old = await readFile(`${STARDEW_SAVE_PATH}${name}/${name}_old`);
+        let savegameinfo = await readFile(`${STARDEW_SAVE_PATH}${name}/SaveGameInfo`);
+        let savegameinfo_old = await readFile(`${STARDEW_SAVE_PATH}${name}/SaveGameInfo_old`);
+        return [file, file_old, savegameinfo, savegameinfo_old];
+    }
+    catch(e){
+        console.log(e);
+        return [false, false, false, false];
+    }
+}
+
+export { getSaves, getSave };
