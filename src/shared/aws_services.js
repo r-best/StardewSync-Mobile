@@ -103,7 +103,6 @@ async function getSave(slotnum){
 async function getSaveId(slotnum){
     try{
         let list = await Storage.list(`saveslot${slotnum}/`);
-        console.log(list)
         let item = list.filter(e => e.key.match(/(.+_old$)|(\/$)|(.*SaveGameInfo$)/) === null)[0].key;
         return item.split('/')[1];
     }

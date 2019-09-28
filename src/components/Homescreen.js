@@ -63,10 +63,9 @@ class Homescreen extends Component{
             
             return true;
         }
+
         let saveid = await aws.getSaveId(index);
-        console.log(await local.saveExists(saveid), saveid)
         if(await local.saveExists(saveid)){
-            console.log(saveid)
             if(!await utils.confirm(
                 'Overwrite existing save?',
                 'A copy of this save already exists on this device, do you want to overwrite it?'))

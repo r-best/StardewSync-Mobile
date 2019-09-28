@@ -64,7 +64,6 @@ async function _readExternal(filepath){
 
 async function saveExists(saveid){
     try{
-        console.log(join(STARDEW_SAVE_PATH, `${saveid}/SaveGameInfo`))
         return await exists(join(STARDEW_SAVE_PATH, `${saveid}/SaveGameInfo`));
     }
     catch(e){
