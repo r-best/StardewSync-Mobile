@@ -62,6 +62,16 @@ async function _readExternal(filepath){
     }
 }
 
+async function saveExists(saveid){
+    try{
+        console.log(join(STARDEW_SAVE_PATH, `${saveid}/SaveGameInfo`))
+        return await exists(join(STARDEW_SAVE_PATH, `${saveid}/SaveGameInfo`));
+    }
+    catch(e){
+        console.log(e);
+    }
+}
+
 /**
  * Returns basic info on the local Stardew Valley saves on this device
  */
@@ -115,4 +125,4 @@ async function getSave(name){
     }
 }
 
-export { getSaves, getSave };
+export { saveExists, getSaves, getSave };

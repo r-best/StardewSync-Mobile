@@ -1,5 +1,5 @@
+import { Alert } from 'react-native';
 import { Auth, API, Storage } from 'aws-amplify';
-
 import { parseStringPromise } from 'xml2js';
 
 
@@ -29,4 +29,21 @@ async function StorageGet(url){
     }
 }
 
-export { NUM_CLOUD_SAVES, StorageGet };
+async function confirm(title, message, options){
+    return new Promise(resolve => {
+        Alert.alert(title, message, [
+            {
+                text: 'No',
+                onPress: () => resolve(false),
+                style: 'cancel'
+            },
+            {
+                text: 'Yes',
+                onPress: () => resolve(true)
+            }
+        ],
+        options);
+    })
+}
+
+export { NUM_CLOUD_SAVES, StorageGet, confirm };

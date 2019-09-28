@@ -16,20 +16,9 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 class LocalSavesScreen extends Component{
     state = { localSaves: [] };
   
-    onSelect(item){
-        // Alert.alert('Unimplemented', 'Hold up', [
-        //     {
-        //         text: 'Cancel',
-        //         onPress: () => {},
-        //         style: 'cancel'
-        //     },
-        //     {
-        //         text: 'Yes',
-        //         onPress: () => console.log("Yes!")
-        //     }
-        // ],
-        // {cancelable: false});
-        this.props.navigation.state.params.callback(item['id'])
+    async onSelect(item){
+        if(await this.props.navigation.state.params.callback(item))
+            this.props.navigation.goBack();
     };
 
     async componentDidMount(){

@@ -3,14 +3,6 @@ import { Auth, API, Storage } from 'aws-amplify';
 import { NUM_CLOUD_SAVES, StorageGet } from './utils';
 
 /**
- * Updated on every call to getSaves(), stores the
- * `SaveGameInfo` xml file of every save in order to build
- * menu items for them on the homescreen, as well as save
- * a few kB on download costs when the user downloads a save
- */
-let saves_cache = [];
-
-/**
  * 
  * @param {number} index 
  * @param {string} file 
@@ -20,6 +12,9 @@ let saves_cache = [];
  */
 async function uploadSave(index, name, file, file_old, savegameinfo, savegameinfo_old){
     try{
+        let existing = await Storage.list(`saveslot${index}`);
+        existing.forEach(async(file) => await Storage.remove(file.key));
+
         let ret = await Storage.put(`saveslot${index}/${name}`, file);
         if(!('key' in ret)) throw Error(`Error uploading ${name}`, ret);
 
@@ -79,12 +74,41 @@ async function getSaves(){
             //     playtime: save['millisecondsPlayed']
             // };
         }
-        saves_cache = ret;
-        return saves_cache;
+        return ret;
     }
     catch(e){
         console.log(e)
-        return saves_cache;
+        return [];
+    }
+}
+
+/**
+ * Returns all the data of a particular save slot, may take time
+ * @param {*} slotnum
+ */
+async function getSave(slotnum){
+    try{
+        let file = await StorageGet(`saveslot${slotnum}/${id}`);
+        let file_old = await readFile(`saveslot${slotnum}/${id}_old`);
+        let savegameinfo = await readFile(`saveslot${slotnum}/SaveGameInfo`);
+        let savegameinfo_old = await readFile(`saveslot${slotnum}/SaveGameInfo_old`);
+        return [file, file_old, savegameinfo, savegameinfo_old];
+    }
+    catch(e){
+        console.log(e);
+        return [false, false, false, false];
+    }
+}
+
+async function getSaveId(slotnum){
+    try{
+        let list = await Storage.list(`saveslot${slotnum}/`);
+        console.log(list)
+        let item = list.filter(e => e.key.match(/(.+_old$)|(\/$)|(.*SaveGameInfo$)/) === null)[0].key;
+        return item.split('/')[1];
+    }
+    catch(e){
+        console.log(e);
     }
 }
 
@@ -112,4 +136,4 @@ async function login(){
     }
 }
 
-export { login, saves_cache, getActiveSlots, getSaves, uploadSave };
+export { login, getActiveSlots, getSaves, getSave, getSaveId, uploadSave };
