@@ -9,6 +9,7 @@
 import React, { Component, Fragment } from 'react';
 import { StyleSheet, FlatList, View, Text, Alert } from 'react-native';
 import { Header, Button, Icon } from 'react-native-elements';
+import Spinner from 'react-native-spinkit';
 
 import * as local from '../shared/fs_android';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -22,11 +23,19 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
  *      at the end of the list, used to add new saves
  */
 class LocalSavesScreen extends Component{
-    state = { localSaves: [] };
+    state = {
+        localSaves: [],
+        loading: true
+    };
   
     async onSelect(item){
-        if(await this.props.navigation.state.params.callback(item))
-            this.props.navigation.goBack();
+        this.setState({ loading: true });
+
+        let res = await this.props.navigation.state.params.callback(item);
+
+        this.setState({ loading: false });
+
+        if(res) this.props.navigation.goBack();
     };
 
     async componentDidMount(){
@@ -38,36 +47,50 @@ class LocalSavesScreen extends Component{
             localSaves.push({ id: "add" });
 
         this.setState({
-            localSaves: localSaves
+            localSaves: localSaves,
+            loading: false
         });
     }
 
     render(){
         return (
-            <FlatList
-                data={this.state.localSaves}
-                keyExtractor={e => e.id}
-                renderItem={({item, i}) => 
-                    item.id !== "add" ? (
-                        <TouchableOpacity style={styles.saveslot} onPress={() => this.onSelect.bind(this)(item)}>
-                                <View style={styles.saveslot_div}>
-                                    <Text>{item['name']}</Text>
-                                    <Text>{item['farm']} Farm</Text>
-                                </View>
-                                <View style={styles.saveslot_div}>
-                                    <Text>${item['money']}</Text>
-                                    <Text>{Math.round(item['playtime']/3600000)} hours</Text>
-                                </View>
-                        </TouchableOpacity>
-                    ) : (
-                        <Button
-                            buttonStyle={styles.saveslot}
-                            icon={{name: "add-circle-outline", type: "material", size: 15, color: "white"}} 
-                            onPress={() => this.onSelect.bind(this)(item)}
-                        />
-                    )
-                }
-            />
+            <View style={{flex:1}}>
+                <FlatList
+                    data={this.state.localSaves}
+                    keyExtractor={e => e.id}
+                    renderItem={({item, i}) => 
+                        item.id !== "add" ? (
+                            <TouchableOpacity style={styles.saveslot} onPress={() => this.onSelect.bind(this)(item)}>
+                                    <View style={styles.saveslot_div}>
+                                        <Text>{item['name']}</Text>
+                                        <Text>{item['farm']} Farm</Text>
+                                    </View>
+                                    <View style={styles.saveslot_div}>
+                                        <Text>${item['money']}</Text>
+                                        <Text>{Math.round(item['playtime']/3600000)} hours</Text>
+                                    </View>
+                            </TouchableOpacity>
+                        ) : (
+                            <Button
+                                buttonStyle={styles.saveslot}
+                                icon={{name: "add-circle-outline", type: "material", size: 15, color: "white"}} 
+                                onPress={() => this.onSelect.bind(this)(item)}
+                            />
+                        )
+                    }
+                />
+                <View style={[ styles.loading_background, {
+                    backgroundColor: this.state.loading ? 'rgba(128, 128, 128, 0.75)' : 'rgba(128, 128, 128, 0)',
+                    zIndex: this.state.loading ? 10 : -1
+                }]}>
+                    <Spinner
+                        isVisible={this.state.loading}
+                        style={styles.loading_spinner}
+                        size={100}
+                        type="WanderingCubes"
+                    />
+                </View>
+            </View>
         );
     }
 };
@@ -88,6 +111,18 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        alignItems: 'center'
+    },
+    loading_spinner: {
+        position: "absolute",
+        top: '30%'
+    },
+    loading_background: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '100%',
         alignItems: 'center'
     }
 });

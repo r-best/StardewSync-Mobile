@@ -9,6 +9,7 @@
 import React, { Component, Fragment } from 'react';
 import { StyleSheet, View, Text, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
+import Spinner from 'react-native-spinkit';
 
 import * as local from '../shared/fs_android';
 import * as aws from '../shared/aws_services';
@@ -19,11 +20,20 @@ import * as utils from '../shared/utils';
  * and their contents
  */
 class Homescreen extends Component{
-    state = { cloudSaves: [] };
+    state = {
+        cloudSaves: [false, false, false],
+        loading: true
+    };
 
     async componentDidMount(){
+        this.update();
+    }
+
+    async update(){
+        this.setState({ loading: true });
         this.setState({
-            cloudSaves: await aws.getSaves()
+            cloudSaves: await aws.getSaves(),
+            loading: false
         });
     }
 
@@ -49,6 +59,7 @@ class Homescreen extends Component{
             if(ret) console.log(`Successfully uploaded save file ${item['id']} to slot ${index}`);
             else console.log(`Error uploading save file ${item['id']} to slot ${index}`);
     
+            this.update();
             return true;
         }
 
@@ -69,6 +80,8 @@ class Homescreen extends Component{
 
         // Helper function that actually performs the download
         let _download = async() => {
+            this.setState({ loading: true });
+            
             console.log("Downloading file from S3...");
             let [ file, file_old, savegameinfo, savegameinfo_old ] = await aws.getSave(index);
             console.log("Successfully downloaded from S3");
@@ -76,6 +89,8 @@ class Homescreen extends Component{
             console.log("Writing to disk...");
             await local.writeSave(saveid, file, file_old, savegameinfo, savegameinfo_old);
             console.log(`Successfully wrote ${saveid} to disk`);
+
+            this.setState({ loading: false });
         }
 
         // The callback function that will be called when a local save is clicked on the next screen
@@ -87,6 +102,7 @@ class Homescreen extends Component{
                     local.deleteSave(item['id']);
 
             await _download();
+            this.update();
             return true;
         }
 
@@ -118,12 +134,13 @@ class Homescreen extends Component{
         
         await aws.deleteSave(index);
         console.log(`Cloud save ${index} deleted!`);
+        this.update();
         return true;
     }
 
     render(){
         return (
-            <View style={{flex:1}}>
+            <View style={{flex:1, alignItems: 'center'}}>
                 {this.state.cloudSaves.map((e,i) => (
                     <View key={i} style={styles.saveslot}>
                         <View style={styles.saveslot}>
@@ -148,6 +165,17 @@ class Homescreen extends Component{
                         </View>
                     </View>
                 ))}
+                <View style={[ styles.loading_background, {
+                    backgroundColor: this.state.loading ? 'rgba(128, 128, 128, 0.75)' : 'rgba(128, 128, 128, 0)',
+                    zIndex: this.state.loading ? 10 : -1
+                }]}>
+                    <Spinner
+                        isVisible={this.state.loading}
+                        style={styles.loading_spinner}
+                        size={100}
+                        type="WanderingCubes"
+                    />
+                </View>
             </View>
         );
     }
@@ -160,6 +188,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
+    },
+    loading_spinner: {
+        position: "absolute",
+        marginTop: '30%'
+    },
+    loading_background: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '100%',
+        alignItems: 'center'
     }
 });
 
