@@ -110,6 +110,17 @@ class Homescreen extends Component{
         });
     }
 
+    async delete(index){
+        if(!await utils.confirm(
+            'Confirm delete',
+            `Are you sure you want to delete cloud save #${index}?`, {cancelable: false}))
+            return false;
+        
+        await aws.deleteSave(index);
+        console.log(`Cloud save ${index} deleted!`);
+        return true;
+    }
+
     render(){
         return (
             <View style={{flex:1}}>
@@ -131,7 +142,7 @@ class Homescreen extends Component{
                                     <Button style={{flex:1}} 
                                         icon={{name: "delete", size: 15, color: "white"}} 
                                         disabled={!e}
-                                        onPress={() => console.log(i)} />
+                                        onPress={() => this.delete(i)} />
                                 </View>
                             </View>
                         </View>

@@ -113,6 +113,22 @@ async function getSaveId(slotnum){
     }
 }
 
+async function deleteSave(slotnum){
+    try{
+        let list = await Storage.list(`saveslot${slotnum}/`);
+        list.forEach(async(e) => {
+            let matches = e.key.match(new RegExp(`saveslot${slotnum}\/.+`));
+            if(matches !== null)
+                await Storage.remove(matches[0]);
+        });
+        return true;
+    }
+    catch(e){
+        console.log(e);
+        return false;
+    }
+}
+
 /**
  * Only used for debugging
  */
@@ -137,4 +153,4 @@ async function login(){
     }
 }
 
-export { login, getActiveSlots, getSaves, getSave, getSaveId, uploadSave };
+export { login, getActiveSlots, getSaves, getSave, getSaveId, uploadSave, deleteSave };
