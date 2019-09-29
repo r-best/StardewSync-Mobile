@@ -12,9 +12,30 @@ import { Header, Button, Icon } from 'react-native-elements';
 import Spinner from 'react-native-spinkit';
 
 /**
- * 
+ * Displays a semitransparent layer with a randomly selected loading wheel
+ * over the component it is placed in as long as its `loading` prop is true.
+ * Have a loading attribute in your component's state and pass it to this
+ * element as the `loading` prop and the spinner will be displayed whenever
+ * you set your loading state to true.
  */
 class LoadingOverlay extends Component{
+    SPINNERS = [
+        "DoubleBounce",
+        "Wave",
+        "WanderingCubes",
+        "ThreeBounce",
+        "Circle",
+        "9CubeGrid",
+        "FoldingCube",
+    ];
+
+    /**
+     * Randomly selects a spinner from the SPINNERS array
+     */
+    getSpinner(){
+        return this.SPINNERS[Math.floor(Math.random() * this.SPINNERS.length)]
+    }
+
     render(){
         return (
             <View style={[ styles.loading_background, {
@@ -25,7 +46,7 @@ class LoadingOverlay extends Component{
                     isVisible={this.props.loading}
                     style={styles.loading_spinner}
                     size={100}
-                    type="WanderingCubes"
+                    type={this.getSpinner()}
                 />
             </View>
         );
