@@ -88,10 +88,12 @@ async function getSaves(){
  */
 async function getSave(slotnum){
     try{
-        let file = await StorageGet(`saveslot${slotnum}/${id}`);
-        let file_old = await readFile(`saveslot${slotnum}/${id}_old`);
-        let savegameinfo = await readFile(`saveslot${slotnum}/SaveGameInfo`);
-        let savegameinfo_old = await readFile(`saveslot${slotnum}/SaveGameInfo_old`);
+        let id = await getSaveId(slotnum);
+
+        let file = await StorageGet(`saveslot${slotnum}/${id}`, parse=false);
+        let file_old = await StorageGet(`saveslot${slotnum}/${id}_old`, parse=false);
+        let savegameinfo = await StorageGet(`saveslot${slotnum}/SaveGameInfo`, parse=false);
+        let savegameinfo_old = await StorageGet(`saveslot${slotnum}/SaveGameInfo_old`, parse=false);
         return [file, file_old, savegameinfo, savegameinfo_old];
     }
     catch(e){

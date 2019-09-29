@@ -14,8 +14,10 @@ import * as local from '../shared/fs_android';
 import * as aws from '../shared/aws_services';
 import * as utils from '../shared/utils';
 
-
-
+/**
+ * The main screen of the app, displays the three cloud save slots
+ * and their contents
+ */
 class Homescreen extends Component{
     state = { cloudSaves: [] };
 
@@ -25,7 +27,13 @@ class Homescreen extends Component{
         });
     }
 
+    /**
+     * Called when the upload button is clicked on a cloud save slot, 
+     * opens the localsaves screen to let the user select which save to upload
+     * @param {number} index The cloud save slot to upload to
+     */
     upload(index){
+        // The callback function that will be called when a local save is clicked on the next screen
         let callback = async(item) => {
             if(!await utils.confirm('Hey', 
                 `Are you sure you want to overwrite cloud save ${index} with Farmer ${item['name']}?`,
@@ -44,34 +52,62 @@ class Homescreen extends Component{
             return true;
         }
 
+        // Launch the localsaves screen with the callback
         this.props.navigation.navigate("LocalSaves", {callback: callback.bind(this)});
     }
 
+    /**
+     * Called when the download button is clicked on a cloud save slot,
+     * checks if another save with the same name exists and offers to 
+     * overwrite it, otherwise opens the localsaves screen to let
+     * the user choose where to put it
+     * @param {number} index The cloud save slot to download from
+     */
     async download(index){
-        let callback = async(item) => {
-            if(!await utils.confirm('Hey', 
-                `Are you sure you want to overwrite Farmer ${item['name']} with cloud save ${index}?`,
-                {cancelable: false}))
-                return false;
-            
+        // Get save id from cloud slot number
+        let saveid = await aws.getSaveId(index);
+
+        // Helper function that actually performs the download
+        let _download = async() => {
             console.log("Downloading file from S3...");
-            let [ file, file_old, savegameinfo, savegameinfo_old ] = await aws.getSave(index)
+            let [ file, file_old, savegameinfo, savegameinfo_old ] = await aws.getSave(index);
             console.log("Successfully downloaded from S3");
-    
+
             console.log("Writing to disk...");
-            console.log(`Successfully wrote ${item[id]} to disk`);
-            
+            await local.writeSave(saveid, file, file_old, savegameinfo, savegameinfo_old);
+            console.log(`Successfully wrote ${saveid} to disk`);
+        }
+
+        // The callback function that will be called when a local save is clicked on the next screen
+        let callback = async(item) => {
+            if(item.id !== "add")
+                if(await utils.confirm('Hey', 
+                    `Are you sure you want to overwrite Farmer ${item['name']} with cloud save ${index}?`,
+                    {cancelable: false}))
+                    local.deleteSave(item['id']);
+
+            await _download();
             return true;
         }
 
-        let saveid = await aws.getSaveId(index);
+        // Check if a save with this name already exists locally and ask the user
+        // if they want to overwrite it
         if(await local.saveExists(saveid)){
-            if(!await utils.confirm(
+            if(await utils.confirm(
                 'Overwrite existing save?',
-                'A copy of this save already exists on this device, do you want to overwrite it?'))
+                'A copy of this save already exists on this device, do you want to overwrite it?')){
+                _download();
+                return true;
+            }
+            else
                 return console.log("Duplicate saves not supported yet!");
         }
-        this.props.navigation.navigate("LocalSaves", {callback: callback.bind(this)});
+
+        // If save doesn't already exist, launch the localsaves screen with the callback
+        this.props.navigation.navigate("LocalSaves", {
+            callback: callback.bind(this),
+            addButtonVisible: true
+        });
     }
 
     render(){
