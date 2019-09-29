@@ -9,8 +9,8 @@
 import React, { Component, Fragment } from 'react';
 import { StyleSheet, View, Text, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import Spinner from 'react-native-spinkit';
 
+import LoadingOverlay from '../shared/LoadingOverlay';
 import * as local from '../shared/fs_android';
 import * as aws from '../shared/aws_services';
 import * as utils from '../shared/utils';
@@ -165,17 +165,7 @@ class Homescreen extends Component{
                         </View>
                     </View>
                 ))}
-                <View style={[ styles.loading_background, {
-                    backgroundColor: this.state.loading ? 'rgba(128, 128, 128, 0.75)' : 'rgba(128, 128, 128, 0)',
-                    zIndex: this.state.loading ? 10 : -1
-                }]}>
-                    <Spinner
-                        isVisible={this.state.loading}
-                        style={styles.loading_spinner}
-                        size={100}
-                        type="WanderingCubes"
-                    />
-                </View>
+                <LoadingOverlay loading={this.state.loading} />
             </View>
         );
     }
@@ -188,18 +178,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
-    },
-    loading_spinner: {
-        position: "absolute",
-        marginTop: '30%'
-    },
-    loading_background: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: '100%',
-        alignItems: 'center'
     }
 });
 

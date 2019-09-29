@@ -9,8 +9,8 @@
 import React, { Component, Fragment } from 'react';
 import { StyleSheet, FlatList, View, Text, Alert } from 'react-native';
 import { Header, Button, Icon } from 'react-native-elements';
-import Spinner from 'react-native-spinkit';
 
+import LoadingOverlay from '../shared/LoadingOverlay';
 import * as local from '../shared/fs_android';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -79,17 +79,7 @@ class LocalSavesScreen extends Component{
                         )
                     }
                 />
-                <View style={[ styles.loading_background, {
-                    backgroundColor: this.state.loading ? 'rgba(128, 128, 128, 0.75)' : 'rgba(128, 128, 128, 0)',
-                    zIndex: this.state.loading ? 10 : -1
-                }]}>
-                    <Spinner
-                        isVisible={this.state.loading}
-                        style={styles.loading_spinner}
-                        size={100}
-                        type="WanderingCubes"
-                    />
-                </View>
+                <LoadingOverlay loading={this.state.loading} />
             </View>
         );
     }
@@ -111,18 +101,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    loading_spinner: {
-        position: "absolute",
-        top: '30%'
-    },
-    loading_background: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: '100%',
         alignItems: 'center'
     }
 });
