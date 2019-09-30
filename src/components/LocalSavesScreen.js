@@ -56,6 +56,7 @@ class LocalSavesScreen extends Component{
         return (
             <View style={{flex:1}}>
                 <FlatList
+                    style={styles.saveslot_container}
                     data={this.state.localSaves}
                     keyExtractor={e => e.id}
                     renderItem={({item, i}) => 
@@ -86,15 +87,25 @@ class LocalSavesScreen extends Component{
 };
 
 const styles = StyleSheet.create({
+    saveslot_container: {
+        marginTop: 20,
+        marginLeft: 25,
+        marginRight: 25
+    },
     saveslot: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
-        marginBottom: 25,
         borderStyle: 'solid',
         borderWidth: 2,
-        borderRadius: 25
+        borderRadius: 25,
+        marginTop: 10,
+        marginBottom: 10,
+        paddingTop: 25,
+        paddingBottom: 25,
+        paddingLeft: 10,
+        paddingRight: 10
     },
     saveslot_div: {
         flex: 1,

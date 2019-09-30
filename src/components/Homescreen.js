@@ -141,9 +141,9 @@ class Homescreen extends Component{
     render(){
         return (
             <View style={{flex:1, alignItems: 'center'}}>
-                {this.state.cloudSaves.map((e,i) => (
-                    <View key={i} style={styles.saveslot}>
-                        <View style={styles.saveslot}>
+                <View style={styles.saveslot_container}>
+                    {this.state.cloudSaves.map((e,i) => (
+                        <View key={i} style={styles.saveslot}>
                             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text>{ e ? e['Farmer']['name'] : "Empty" }</Text>
                             </View>
@@ -163,8 +163,8 @@ class Homescreen extends Component{
                                 </View>
                             </View>
                         </View>
-                    </View>
-                ))}
+                    ))}
+                </View>
                 <LoadingOverlay loading={this.state.loading} />
             </View>
         );
@@ -172,12 +172,25 @@ class Homescreen extends Component{
 };
 
 const styles = StyleSheet.create({
+    saveslot_container: {
+        width: '90%',
+        flex: 1,
+        marginTop: 25,
+        marginBottom: 25
+    },
     saveslot: {
         display: 'flex',
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
+        borderStyle: 'solid',
+        borderWidth: 2,
+        borderRadius: 25,
+        marginTop: 25,
+        marginBottom: 25,
+        paddingLeft: 10,
+        paddingRight: 10
     }
 });
 
