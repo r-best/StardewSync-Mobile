@@ -1,4 +1,4 @@
-export default awsconfig = {
+let awsconfig = {
     Auth: {
         identityPoolId: 'us-east-1:64d632ee-d1f1-4a72-9665-615c65fa0827',
         region: 'us-east-1',
@@ -18,3 +18,5 @@ export default awsconfig = {
         }
     }
 }
+
+export { awsconfig };

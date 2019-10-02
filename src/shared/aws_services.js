@@ -129,28 +129,4 @@ async function deleteSave(slotnum){
     }
 }
 
-/**
- * Only used for debugging
- */
-async function login(){
-    try{
-        console.log("Logging in!");
-
-        // const user = await Auth.signIn('dev1', '123456');
-        const user = await Auth.signIn('dev2', '123456');
-
-        if(user.challengeName){
-            console.log(`User must complete a login challenge of type ${user.challengeName}, this should have been impossible`);
-            return false;
-        }
-
-        console.log("Logged in!");
-        console.log(user);
-        return true;
-    } catch (err) {
-        console.log(err.code);
-        return false;
-    }
-}
-
-export { login, getActiveSlots, getSaves, getSave, getSaveId, uploadSave, deleteSave };
+export { getActiveSlots, getSaves, getSave, getSaveId, uploadSave, deleteSave };
