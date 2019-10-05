@@ -144,9 +144,22 @@ class Homescreen extends Component{
                 <View style={styles.saveslot_container}>
                     {this.state.cloudSaves.map((e,i) => (
                         <View key={i} style={styles.saveslot}>
-                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                <Text>{ e ? e['Farmer']['name'] : "Empty" }</Text>
-                            </View>
+                            { e ? (
+                                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                    <View style={styles.saveslot_div}>
+                                        <Text>{e['name']}</Text>
+                                        <Text>{e['farm']} Farm</Text>
+                                    </View>
+                                    <View style={styles.saveslot_div}>
+                                        <Text>${e['money']}</Text>
+                                        <Text>{Math.round(e['playtime']/3600000)} hours</Text>
+                                    </View>
+                                </View>
+                            ) : (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text>Empty</Text>
+                                </View>
+                            )}
                             <View style={{ justifyContent: 'center' }}>
                                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Button style={{flex:1}} 
@@ -191,6 +204,13 @@ const styles = StyleSheet.create({
         marginBottom: 25,
         paddingLeft: 10,
         paddingRight: 10
+    },
+    saveslot_div: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

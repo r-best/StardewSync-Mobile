@@ -62,14 +62,14 @@ class LocalSavesScreen extends Component{
                     renderItem={({item, i}) => 
                         item.id !== "add" ? (
                             <TouchableOpacity style={styles.saveslot} onPress={() => this.onSelect.bind(this)(item)}>
-                                    <View style={styles.saveslot_div}>
-                                        <Text>{item['name']}</Text>
-                                        <Text>{item['farm']} Farm</Text>
-                                    </View>
-                                    <View style={styles.saveslot_div}>
-                                        <Text>${item['money']}</Text>
-                                        <Text>{Math.round(item['playtime']/3600000)} hours</Text>
-                                    </View>
+                                <View style={styles.saveslot_div}>
+                                    <Text>{item['name']}</Text>
+                                    <Text>{item['farm']} Farm</Text>
+                                </View>
+                                <View style={styles.saveslot_div}>
+                                    <Text>${item['money']}</Text>
+                                    <Text>{Math.round(item['playtime']/3600000)} hours</Text>
+                                </View>
                             </TouchableOpacity>
                         ) : (
                             <Button
