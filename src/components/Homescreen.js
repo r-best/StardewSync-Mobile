@@ -7,10 +7,11 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { StyleSheet, View, Text, Alert } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Button } from 'react-native-elements';
 
 import LoadingOverlay from '../shared/LoadingOverlay';
+import RefreshOverlay from '../shared/RefreshOverlay';
 import * as local from '../shared/fs_android';
 import * as aws from '../shared/aws_services';
 import * as utils from '../shared/utils';
@@ -141,6 +142,10 @@ class Homescreen extends Component{
     render(){
         return (
             <View style={{flex:1, alignItems: 'center'}}>
+
+                {/* This refresh overlay covers the space outside the save slots */}
+                <RefreshOverlay onRefresh={this.update.bind(this)} />
+
                 <View style={styles.saveslot_container}>
                     {this.state.cloudSaves.map((e,i) => (
                         <View key={i} style={styles.saveslot}>
@@ -160,6 +165,11 @@ class Homescreen extends Component{
                                     <Text>Empty</Text>
                                 </View>
                             )}
+
+                            {/* THIS refresh overlay covers the space INSIDE the save slots EXCEPT for
+                            the buttons, so you can still click on them */}
+                            <RefreshOverlay onRefresh={this.update.bind(this)} />
+
                             <View style={{ justifyContent: 'center' }}>
                                 <View style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Button style={{flex:1}} 

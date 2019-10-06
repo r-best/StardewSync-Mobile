@@ -40,7 +40,7 @@ class LoadingOverlay extends Component{
         return (
             <View style={[ styles.loading_background, {
                 backgroundColor: this.props.loading ? 'rgba(128, 128, 128, 0.75)' : 'rgba(128, 128, 128, 0)',
-                zIndex: this.props.loading ? 10 : -1
+                zIndex: this.props.loading ? 100 : -1
             }]}>
                 <Spinner
                     isVisible={this.props.loading}
