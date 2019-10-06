@@ -1,14 +1,14 @@
 import { Auth, API, Storage } from 'aws-amplify';
 
-import { NUM_CLOUD_SAVES, StorageGet } from './utils';
+import { NUM_CLOUD_SAVES, StorageGet, toast } from './utils';
 
 /**
  * Returns basic info on the user's cloud saves, read
  * from each save's `SaveGameInfo` file
  * 
- * @returns An array of length NUM_CLOUD_SAVES containing 
- *  save info objects for slots with saves and false for
- *  slots that are empty
+ * @returns {Promise<[]>} An array of length NUM_CLOUD_SAVES
+ *  containing save info objects for slots with saves and
+ *  false for slots that are empty
  */
 async function getSaves(){
     try{
@@ -32,6 +32,7 @@ async function getSaves(){
     }
     catch(e){
         console.log(e)
+        toast(`Error reading cloud saves`);
         return [];
     }
 }
@@ -42,8 +43,8 @@ async function getSaves(){
  * TO DO: Should check to make sure the slot isn't empty
  * 
  * @param {number} slotnum The index of the slot to download
- * @returns {string[4]|boolean} An array of the string contents of each file
- *  comprising the save, or false on failure
+ * @returns {Promise<string[4]|boolean>} An array of the string contents
+ *  of each file comprising the save, or false on failure
  */
 async function getSave(slotnum){
     try{
@@ -57,6 +58,7 @@ async function getSave(slotnum){
     }
     catch(e){
         console.log(e);
+        toast(`Error retrieving cloud save ${slotnum}`);
         return false;
     }
 }
@@ -66,7 +68,7 @@ async function getSave(slotnum){
  * 
  * @param {number} index The destination cloud save slot
  * @param {string} id The ID of the save file
- * @returns {boolean} True if successful, false otherwise
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 async function uploadSave(index, id, file, file_old, savegameinfo, savegameinfo_old){
     try{
@@ -89,6 +91,7 @@ async function uploadSave(index, id, file, file_old, savegameinfo, savegameinfo_
     }
     catch(e){
         console.log(e);
+        toast(`Error uploading save ${id} to cloud save slot ${index}`);
         return false;
     }
 }
@@ -97,7 +100,7 @@ async function uploadSave(index, id, file, file_old, savegameinfo, savegameinfo_
  * Deletes a cloud save by index
  * 
  * @param {number} slotnum The index of the cloud save to delete
- * @returns {boolean} True if successful, false otherwise
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 async function deleteSave(slotnum){
     try{
@@ -111,6 +114,7 @@ async function deleteSave(slotnum){
     }
     catch(e){
         console.log(e);
+        toast(`Error deleting cloud save ${slotnum}`);
         return false;
     }
 }
@@ -120,7 +124,7 @@ async function deleteSave(slotnum){
  * TO DO: Should check to make sure the slot isn't empty
  * 
  * @param {number} slotnum The slot index to get the ID of
- * @returns {string|boolean} The ID of the save, or false on failure
+ * @returns {Promise<string|boolean>} The ID of the save, or false on failure
  */
 async function getSaveId(slotnum){
     try{
@@ -130,6 +134,7 @@ async function getSaveId(slotnum){
     }
     catch(e){
         console.log(e);
+        toast(`Error checking ID of cloud save ${slotnum}`);
         return false;
     }
 }
@@ -137,7 +142,7 @@ async function getSaveId(slotnum){
 /**
  * Helper method to return the currently in-use cloud save slots
  * 
- * @returns {number[]} An array containing the indices
+ * @returns {Promise<number[]>} An array containing the indices
  *  of the cloud saves that are not currently empty
  */
 async function _getActiveSlots(){
@@ -153,6 +158,8 @@ async function _getActiveSlots(){
     }
     catch(e){
         console.log(e)
+        toast(`Error retrieving active cloud saves`);
+        return [];
     }
 }
 

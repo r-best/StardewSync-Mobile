@@ -3,13 +3,16 @@ import { PermissionsAndroid } from 'react-native';
 import { parseStringPromise } from 'xml2js';
 import * as path from 'path';
 
+import { toast } from './utils';
+
 const STARDEW_SAVE_PATH = ExternalStorageDirectoryPath + "/StardewValley/";
 
 /**
  * Returns basic info on the local Stardew Valley saves on this device,
  * read from each save's `SaveGameInfo` file
  * 
- * @returns An array containing a save info object for each local save
+ * @returns {Promise<[]>} An array containing a save info object for each
+ *  local save
  */
 async function getSaves(){
     try{
@@ -34,12 +37,15 @@ async function getSaves(){
             }
             return saves;
         }
-        else
+        else{
             console.log('Storage permission denied :(');
+            toast(`Cannot display local saves without read permissions`);
             return [];
+        }
     }
     catch(e){
         console.log(e);
+        toast(`Error reading local saves`);
         return [];
     }
 }
@@ -50,7 +56,7 @@ async function getSaves(){
  * TO DO: Should check to make sure the slot isn't empty
  * 
  * @param {*} id The ID of the save to retrieve
- * @returns {string[4]|boolean} An array of the string contents of each file
+ * @returns {Promise<string[4]|boolean>} An array of the string contents of each file
  *  comprising the save, or false on failure
  */
 async function getSave(id){
@@ -63,6 +69,7 @@ async function getSave(id){
     }
     catch(e){
         console.log(e);
+        toast(`Error reading save ${id}`);
         return false;
     }
 }
@@ -71,7 +78,7 @@ async function getSave(id){
  * Writes a save to the local Stardew Valley saves folder
  * 
  * @param {string} id The ID of the save
- * @returns {boolean} True if successful, false otherwise
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 async function writeSave(id, file, file_old, savegameinfo, savegameinfo_old){
     try{
@@ -91,6 +98,7 @@ async function writeSave(id, file, file_old, savegameinfo, savegameinfo_old){
     }
     catch(e){
         console.log(e);
+        toast(`Error writing save ${id} to local storage`);
         return false;
     }
 }
@@ -99,7 +107,7 @@ async function writeSave(id, file, file_old, savegameinfo, savegameinfo_old){
  * Deletes a local save by ID
  * 
  * @param {string} id The ID of the save to delete
- * @returns {boolean} True if successful, false otherwise
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 async function deleteSave(id){
     try{
@@ -108,11 +116,13 @@ async function deleteSave(id){
             return true;
         } else {
             console.log('Storage permission denied :(');
+            toast(`Cannot delete local saves without write permissions`);
             return false;
         }
     }
     catch(e){
         console.log(e);
+        toast(`Error deleting save ${id}`);
         return false;
     }
 }
@@ -121,7 +131,7 @@ async function deleteSave(id){
  * Checks if a save file with the given ID exists on the device
  * 
  * @param {string} saveid The ID to search for
- * @returns {boolean} Whether or not the save file exists
+ * @returns {Promise<boolean>} Whether or not the save file exists
  */
 async function saveExists(saveid){
     try{
@@ -129,6 +139,7 @@ async function saveExists(saveid){
     }
     catch(e){
         console.log(e);
+        toast(`Error checking if save ${saveid} exists`);
         return false;
     }
 }
@@ -141,7 +152,7 @@ async function saveExists(saveid){
  * @param {string} filepath Destination path within the Stardew
  *  Valley saves folder
  * @param {string} file Contents to write to file 
- * @returns {boolean} True if successful, false otherwise
+ * @returns {Promise<boolean>} True if successful, false otherwise
  */
 async function _write(filepath, file){
     console.log("WRITING TO", filepath);
@@ -153,11 +164,13 @@ async function _write(filepath, file){
             return true;
         } else {
             console.log('Storage permission denied :(');
+            toast(`Cannot write file to local storage without write permissions`);
             return false;
         }
     }
     catch(e){
         console.log(e);
+        toast(`Error writing file ${filepath}`);
         return false;
     }
 }
@@ -169,7 +182,7 @@ async function _write(filepath, file){
  * 
  * @param {string} filepath Path to the file to be read from
  *  the Stardew Valley saves folder
- * @returns {string|boolean} File contents if successful, false otherwise
+ * @returns {Promise<string|boolean>} File contents if successful, false otherwise
  */
 async function _read(filepath){
     try{
@@ -177,11 +190,13 @@ async function _read(filepath){
             return await readFile(path.join(STARDEW_SAVE_PATH, filepath));
         else{
             console.log('Storage permission denied :(');
+            toast(`Cannot read file from local storage without read permissions`);
             return false;
         }
     }
     catch(e){
         console.log(e);
+        toast(`Error reading file ${filepath}`);
         return false;
     }
 }
@@ -192,7 +207,7 @@ async function _read(filepath){
  * Permissions are retained, so subsequent calls will simply
  * return true if the user has already said yes in the past
  * 
- * @returns {boolean} Whether or not the user has allowed write permissions
+ * @returns {Promise<boolean>} Whether or not the user has allowed write permissions
  */
 async function _checkWritePermission(){
     const granted = await PermissionsAndroid.request(
@@ -214,7 +229,7 @@ async function _checkWritePermission(){
  * Permissions are retained, so subsequent calls will simply
  * return true if the user has already said yes in the past
  * 
- * @returns {boolean} Whether or not the user has allowed read permissions
+ * @returns {Promise<boolean>} Whether or not the user has allowed read permissions
  */
 async function _checkReadPermission(){
     const granted = await PermissionsAndroid.request(
