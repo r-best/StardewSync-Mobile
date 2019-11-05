@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Button, Text, View } from 'react-native';
+
+import RNRestart from 'react-native-restart';
+
+import { Auth } from 'aws-amplify';
 
 class LeftDrawer extends Component {
     navigateToScreen = (route) => () => {
@@ -10,10 +14,22 @@ class LeftDrawer extends Component {
         }));
     }
 
+    async logOut(){
+        await Auth.signOut();
+
+        // I don't have time for this, if you won't recognize that the user
+        // is logged out and send them back to the login screen I'll just
+        // reload the entire damn app so you HAVE to.
+        RNRestart.Restart();
+    }
+
     render () {
         return (
             <View style={styles.container}>
-                <Text>RIGHT DRAWER</Text>
+                <Button
+                    title="I WANT TO GET OFF MR BONES WILD RIDE"
+                    onPress={() => this.logOut()}
+                />
             </View>
         );
     }
@@ -25,8 +41,8 @@ LeftDrawer.propTypes = {
 
 styles = StyleSheet.create({
     container: {
-        paddingTop: 20,
-        flex: 1
+        flex: 1,
+        padding: 20
     },
     navSectionStyle: {
         backgroundColor: 'lightgrey'

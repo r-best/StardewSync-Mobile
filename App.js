@@ -15,16 +15,15 @@ import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator, DrawerActions } from 'react-navigation-drawer';
 
-import { login } from './src/shared/aws_services';
-import awsconfig from './awsconfig-dev';
 import Homescreen from './src/components/Homescreen';
+import LocalSavesScreen from './src/components/LocalSavesScreen';
 import LeftDrawer from './src/components/LeftDrawer';
 import RightDrawer from './src/components/RightDrawer';
 
+import { awsconfig } from './config';
+
 Amplify.configure(awsconfig);
 Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
-
-login();
 
 const stackNav = createStackNavigator({
     Home: {
@@ -45,6 +44,12 @@ const stackNav = createStackNavigator({
                     onPress={navigation.toggleRightDrawer}
                 />
             )
+        })
+    },
+    LocalSaves: {
+        screen: LocalSavesScreen,
+        navigationOptions: ({navigation}) => ({
+            title: "Local Save Files"
         })
     }
 });
