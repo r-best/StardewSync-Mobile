@@ -44,10 +44,10 @@ async function getSave(slotnum){
         });
 
         return [
-            await fetch(signedURLs['File']),
-            await fetch(signedURLs['File_old']),
-            await fetch(signedURLs['SaveGameInfo']),
-            await fetch(signedURLs['SaveGameInfo_old']),
+            await (await fetch(signedURLs['File'])).text(),
+            await (await fetch(signedURLs['File_old'])).text(),
+            await (await fetch(signedURLs['SaveGameInfo'])).text(),
+            await (await fetch(signedURLs['SaveGameInfo_old'])).text(),
         ];
     }
     catch(e){
@@ -117,38 +117,14 @@ async function deleteSave(slotnum){
  */
 async function getSaveId(slotnum){
     try{
-        let list = await Storage.list(`saveslot${slotnum}/`);
-        let item = list.filter(e => e.key.match(/(.+_old$)|(\/$)|(.*SaveGameInfo$)/) === null)[0].key;
-        return item.split('/')[1];
+        return await API.get('api', `/saves/${slotnum}/id`, {
+            headers: { Authorization: await _getToken() }
+        })
     }
     catch(e){
         console.log(e);
         toast(`Error checking ID of cloud save ${slotnum}`);
         return false;
-    }
-}
-
-/**
- * Helper method to return the currently in-use cloud save slots
- * 
- * @returns {Promise<number[]>} An array containing the indices
- *  of the cloud saves that are not currently empty
- */
-async function _getActiveSlots(){
-    try{
-        let saveDirs = await Storage.list('');
-
-        let slots = [];
-        saveDirs.forEach(e => {
-            let matches = e.key.match(/^saveslot(\d)\/SaveGameInfo/);
-            if(matches !== null) slots.push(parseInt(matches[1]));
-        });
-        return slots.filter((e, index) => slots.indexOf(e) === index);
-    }
-    catch(e){
-        console.log(e)
-        toast(`Error retrieving active cloud saves`);
-        return [];
     }
 }
 
