@@ -7,8 +7,8 @@ let awsconfig = {
     },
     API: {
         endpoints: [{
-            name: "notifs",
-            endpoint: "https://3pff544onj.execute-api.us-east-1.amazonaws.com/dev"
+            name: "api",
+            endpoint: "https://lyhosse2ii.execute-api.us-east-1.amazonaws.com/dev"
         }]
     },
     Storage: {

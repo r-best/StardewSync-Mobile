@@ -2,6 +2,11 @@ import { Auth, API, Storage } from 'aws-amplify';
 
 import { NUM_CLOUD_SAVES, StorageGet, toast } from './utils';
 
+async function _getToken(){
+    let user = await Auth.currentAuthenticatedUser();
+    return user.signInUserSession.idToken.jwtToken;
+}
+
 /**
  * Returns basic info on the user's cloud saves, read
  * from each save's `SaveGameInfo` file
@@ -12,23 +17,9 @@ import { NUM_CLOUD_SAVES, StorageGet, toast } from './utils';
  */
 async function getSaves(){
     try{
-        let activeSlots = await _getActiveSlots();
-
-        let ret = [];
-        for(let i = 1; i <= NUM_CLOUD_SAVES; i++){
-            if(activeSlots.includes(i)){
-                let save = await StorageGet(`saveslot${i}/SaveGameInfo`);
-                ret[i] = {
-                    name: save['Farmer']['name'],
-                    farm: save['Farmer']['farmName'],
-                    money: save['Farmer']['money'],
-                    playtime: save['Farmer']['millisecondsPlayed']
-                };
-            }
-            else
-                ret[i] = false;
-        }
-        return ret;
+        return await API.get('api', '/saves', {
+            headers: { Authorization: await _getToken() }
+        });
     }
     catch(e){
         console.log(e)
@@ -48,13 +39,16 @@ async function getSaves(){
  */
 async function getSave(slotnum){
     try{
-        let id = await getSaveId(slotnum);
+        let signedURLs = await API.get('api', `/saves/${slotnum}`, {
+            headers: { Authorization: await _getToken() }
+        });
 
-        let file = await StorageGet(`saveslot${slotnum}/${id}`, parse=false);
-        let file_old = await StorageGet(`saveslot${slotnum}/${id}_old`, parse=false);
-        let savegameinfo = await StorageGet(`saveslot${slotnum}/SaveGameInfo`, parse=false);
-        let savegameinfo_old = await StorageGet(`saveslot${slotnum}/SaveGameInfo_old`, parse=false);
-        return [file, file_old, savegameinfo, savegameinfo_old];
+        return [
+            await fetch(signedURLs['File']),
+            await fetch(signedURLs['File_old']),
+            await fetch(signedURLs['SaveGameInfo']),
+            await fetch(signedURLs['SaveGameInfo_old']),
+        ];
     }
     catch(e){
         console.log(e);
@@ -72,20 +66,15 @@ async function getSave(slotnum){
  */
 async function uploadSave(index, id, file, file_old, savegameinfo, savegameinfo_old){
     try{
-        let existing = await Storage.list(`saveslot${index}`);
-        existing.forEach(async(file) => await Storage.remove(file.key));
+        let signedURLs = await API.put('api', `/saves/${index}`, {
+            headers: { Authorization: await _getToken() },
+            queryStringParameters: { id: id }
+        });
 
-        let ret = await Storage.put(`saveslot${index}/${id}`, file);
-        if(!('key' in ret)) throw Error(`Error uploading ${id}`, ret);
-
-        ret = await Storage.put(`saveslot${index}/${id}_old`, file_old);
-        if(!('key' in ret)) throw Error(`Error uploading ${id}_old`, ret);
-
-        ret = await Storage.put(`saveslot${index}/SaveGameInfo`, savegameinfo);
-        if(!('key' in ret)) throw Error(`Error uploading SaveGameInfo`, ret);
-
-        ret = await Storage.put(`saveslot${index}/SaveGameInfo_old`, savegameinfo_old);
-        if(!('key' in ret)) throw Error(`Error uploading SaveGameInfo`, ret);
+        await fetch(signedURLs['File'], { method: 'PUT', body: file });
+        await fetch(signedURLs['File_old'], { method: 'PUT', body: file_old });
+        await fetch(signedURLs['SaveGameInfo'], { method: 'PUT', body: savegameinfo });
+        await fetch(signedURLs['SaveGameInfo_old'], { method: 'PUT', body: savegameinfo_old });
 
         return true;
     }
