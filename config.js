@@ -10,12 +10,6 @@ let awsconfig = {
             name: "api",
             endpoint: "https://lyhosse2ii.execute-api.us-east-1.amazonaws.com/dev"
         }]
-    },
-    Storage: {
-        AWSS3: {
-            bucket: 'stardewsync-dev',
-            region: 'us-east-1',
-        }
     }
 }
 

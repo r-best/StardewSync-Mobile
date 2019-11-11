@@ -9,7 +9,7 @@
 import React from 'react'; // Unused here but needed for withAuthenticator or it crashes on login
 import { Dimensions, TouchableOpacity, Text, Button } from 'react-native';
 import { Icon } from 'react-native-elements';
-import Amplify, { Storage } from 'aws-amplify';
+import Amplify from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react-native';
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -23,7 +23,6 @@ import RightDrawer from './src/components/RightDrawer';
 import { awsconfig } from './config';
 
 Amplify.configure(awsconfig);
-Storage.configure({level: 'private', customPrefix:{private:'userdata/'}});
 
 const stackNav = createStackNavigator({
     Home: {

@@ -1,41 +1,5 @@
 import { Alert, ToastAndroid } from 'react-native';
-import { Storage } from 'aws-amplify';
 import { parseStringPromise } from 'xml2js';
-
-
-/** The number of cloud save slots this user has */
-const NUM_CLOUD_SAVES = 3;
-
-/**
- * Replacement for Amplify's Storage.get because for some reason it
- * returns a public URL where you can access the object instead of
- * just returning the object
- * 
- * @param {string} url The path to the object to fetch
- * @param {boolean} parse If true, returns the pared JSON object
- *  instead of an xml string
- */
-async function StorageGet(url, parse=true){
-    try{
-        let S3Url = await Storage.get(url, {expires:60});
-        let xml = await (await fetch(S3Url)).text();
-
-        if(!parse) return xml;
-
-        let json = await parseStringPromise(xml);
-
-        if("Error" in json){
-            console.log(`Error fetching '${url}': ${json['Error']['Message']}`);
-            return false;
-        }
-
-        return json;
-    }
-    catch(e){
-        console.log(e)
-        return parse ? {} : "";
-    }
-}
 
 /**
  * Displays a toast using `react-native`'s `ToastAndroid` module
@@ -76,4 +40,4 @@ async function confirm(title, message, options){
     });
 }
 
-export { NUM_CLOUD_SAVES, StorageGet, toast, confirm };
+export { toast, confirm };

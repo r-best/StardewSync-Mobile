@@ -1,6 +1,6 @@
-import { Auth, API, Storage } from 'aws-amplify';
+import { Auth, API } from 'aws-amplify';
 
-import { NUM_CLOUD_SAVES, StorageGet, toast } from './utils';
+import { toast } from './utils';
 
 async function _getToken(){
     let user = await Auth.currentAuthenticatedUser();
@@ -11,8 +11,8 @@ async function _getToken(){
  * Returns basic info on the user's cloud saves, read
  * from each save's `SaveGameInfo` file
  * 
- * @returns {Promise<[]>} An array of length NUM_CLOUD_SAVES
- *  containing save info objects for slots with saves and
+ * @returns {Promise<[]>} An array of length 3 containing
+ *  save info objects for slots with saves and
  *  false for slots that are empty
  */
 async function getSaves(){
@@ -93,11 +93,8 @@ async function uploadSave(index, id, file, file_old, savegameinfo, savegameinfo_
  */
 async function deleteSave(slotnum){
     try{
-        let list = await Storage.list(`saveslot${slotnum}/`);
-        list.forEach(async(e) => {
-            let matches = e.key.match(new RegExp(`saveslot${slotnum}\/.+`));
-            if(matches !== null)
-                await Storage.remove(matches[0]);
+        await API.del('api', `/saves/${slotnum}`, {
+            headers: { Authorization: await _getToken() }
         });
         return true;
     }
